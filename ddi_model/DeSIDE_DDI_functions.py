@@ -1,24 +1,17 @@
-import pandas as pd
-import numpy as np
-
-import keras
-import keras.backend as K
-from keras.callbacks import ModelCheckpoint
-from tensorflow.keras.utils import Sequence
-from tensorflow.keras.utils import to_categorical
 import math
 
-from sklearn.metrics import roc_auc_score
-from sklearn.metrics import roc_curve, precision_recall_curve, average_precision_score
+import tensorflow.compat.v1.keras as keras
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import tensorflow.compat.v1.keras.backend as K
 from sklearn.metrics import average_precision_score
 from sklearn.metrics import confusion_matrix
-import seaborn as sns
+from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_curve
+from tensorflow.compat.v1.keras.utils import to_categorical
 
-from keras.models import model_from_json
-import matplotlib.pyplot as plt
-import matplotlib
-
-from scipy import stats
 
 # find feature in the generator
 def find_exp(drug_df, ts_exp, column_name):

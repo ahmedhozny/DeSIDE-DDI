@@ -22,7 +22,7 @@ def load_data(file_path, train_x_name, train_y_name, test_x_name, test_y_name):
     return double_train_data, test_x, test_y
 
 # load examples
-def load_train_example(file_path='../data/', train_x_name='ddi_example_x.csv', train_y_name='ddi_example_y.csv'):
+def load_train_example(file_path='./data/', train_x_name='ddi_example_x.csv', train_y_name='ddi_example_y.csv'):
     train_x = pd.read_csv(file_path + train_x_name)
     train_y = pd.read_csv(file_path + train_y_name)
 
@@ -37,5 +37,5 @@ def load_train_example(file_path='../data/', train_x_name='ddi_example_x.csv', t
     
     return double_train_data
 
-def load_exp(file_path='../data/'):
+def load_exp(file_path='./data/'):
     return pd.read_csv(file_path + 'twosides_predicted_expression_scaled.csv')

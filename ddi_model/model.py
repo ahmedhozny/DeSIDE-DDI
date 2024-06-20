@@ -1,11 +1,11 @@
-import keras
-from keras.layers import *
-from keras.regularizers import *
-import keras.backend as K
-from keras.models import Model, Sequential
-from keras.optimizers import Adam
+from tensorflow.compat.v1.keras.layers import *
+from tensorflow.compat.v1.keras.regularizers import *
+import tensorflow.compat.v1.keras.backend as K
+from tensorflow.compat.v1.keras.models import Model, Sequential
+from tensorflow.compat.v1.keras.optimizers import Adam
 
-from DeSIDE_DDI_functions import *
+from ddi_model.DeSIDE_DDI_functions import *
+
 
 class DDI_model(object):
     def __init__(self,input_drug_dim=978, input_se_dim=1, drug_emb_dim=100, se_emb_dim=100, output_dim=1, margin=1, drug_activation='elu'):
@@ -26,7 +26,7 @@ class DDI_model(object):
         drug2_exp = Input(shape=(self.input_drug_dim, ))
         
         shared_layer = Sequential(name='drug_embed_shared')
-        shared_layer.add(Dense(output_dim=self.input_drug_dim, activation=self.drug_activation))
+        shared_layer.add(Dense(self.input_drug_dim, activation=self.drug_activation))
         shared_layer.add(BatchNormalization())
 
         drug1 = shared_layer(drug1_exp)
@@ -43,7 +43,7 @@ class DDI_model(object):
         drug2_selected = BatchNormalization()(drug2_selected)
         
         shared_layer2 = Sequential(name='drug_embed_shared2')
-        shared_layer2.add(Dense(output_dim=self.drug_emb_dim, kernel_regularizer=l2(0.001), activation=self.drug_activation))
+        shared_layer2.add(Dense(self.drug_emb_dim, kernel_regularizer=l2(0.001), activation=self.drug_activation))
         shared_layer2.add(BatchNormalization())
 
         drug1_emb = shared_layer2(drug1_selected)
@@ -177,14 +177,23 @@ class DDI_model(object):
     def load_model(self, model_load_path, model_name, threshold_name):
         self.model.load_weights(model_load_path+model_name)
         self.optimal_threshold = pd.read_csv(model_load_path+threshold_name, index_col=0)
-        
+
     def predict(self, x, exp_df, batch_size=1024):
         y = np.zeros(x.shape[0])
-        
+
         test_gen = custom_dataGenerator(x, y, batch_size=batch_size, exp_df=exp_df, shuffle=False)
         pred_y = self.model.predict_generator(generator=test_gen)
-        predicted_result = mean_predicted_score(pd.concat([x, pd.DataFrame(y, columns=['label'])], axis=1), pred_y, with_plot=False)
+
+        # Reset indices to ensure they are unique
+        x_reset = x.reset_index(drop=True)
+        y_reset = pd.DataFrame(y, columns=['label']).reset_index(drop=True)
+        pred_y_reset = pd.DataFrame(pred_y, columns=['predicted_score']).reset_index(drop=True)
+
+        # Concatenate x, y, and pred_y with reset indices
+        predicted_result = pd.concat([x_reset, y_reset, pred_y_reset], axis=1)
+
+        predicted_result = mean_predicted_score(predicted_result, pred_y_reset, with_plot=False)
         predicted_label, thr = calculate_predicted_label_ver3(predicted_result, self.optimal_threshold)
-        predicted_label = predicted_label[['drug1','drug2','SE','predicted_label','predicted_score']]
-        
+        predicted_label = predicted_label[['drug1', 'drug2', 'SE', 'predicted_label', 'predicted_score']]
+
         return predicted_label

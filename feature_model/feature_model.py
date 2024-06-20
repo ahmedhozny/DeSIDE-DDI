@@ -1,14 +1,18 @@
-from feature_model_functions import *
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 
-import tensorflow as tf
-import keras
-from keras.layers import *
-from keras.regularizers import *
-import keras.backend as K
-from keras.models import Model, Sequential
-from keras.optimizers import Adam
-from keras.callbacks import ModelCheckpoint, Callback, EarlyStopping
-from keras import metrics
+
+from feature_model.feature_model_functions import *
+
+import tensorflow.compat.v1 as tf
+import tensorflow.compat.v1.keras as keras
+from tensorflow.compat.v1.keras.layers import *
+from tensorflow.compat.v1.keras.regularizers import *
+import tensorflow.compat.v1.keras.backend as K
+from tensorflow.compat.v1.keras.models import Model, Sequential
+from tensorflow.compat.v1.keras.optimizers import Adam
+from tensorflow.compat.v1.keras.callbacks import ModelCheckpoint, Callback, EarlyStopping
+from tensorflow.compat.v1.keras import metrics
 
 
 class Feature_model(object):
@@ -66,7 +70,7 @@ class Feature_model(object):
             
             model = Model(inputs=[structure, prop], outputs=output)
 
-        model.compile(loss="mean_squared_error", optimizer=Adam(0.0001), metrics=[metrics.mse, self.tf_pearson])
+        model.compile(loss="mean_squared_error", optimizer=Adam(0.0001))
         
         return model
         
