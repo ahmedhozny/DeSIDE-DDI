@@ -183,16 +183,8 @@ class DDI_model(object):
 
         test_gen = custom_dataGenerator(x, y, batch_size=batch_size, exp_df=exp_df, shuffle=False)
         pred_y = self.model.predict_generator(generator=test_gen)
-
-        # Reset indices to ensure they are unique
-        x_reset = x.reset_index(drop=True)
-        y_reset = pd.DataFrame(y, columns=['label']).reset_index(drop=True)
-        pred_y_reset = pd.DataFrame(pred_y, columns=['predicted_score']).reset_index(drop=True)
-
-        # Concatenate x, y, and pred_y with reset indices
-        predicted_result = pd.concat([x_reset, y_reset, pred_y_reset], axis=1)
-
-        predicted_result = mean_predicted_score(predicted_result, pred_y_reset, with_plot=False)
+        predicted_result = mean_predicted_score(pd.concat([x, pd.DataFrame(y, columns=['label'])], axis=1), pred_y,
+                                                with_plot=False)
         predicted_label, thr = calculate_predicted_label_ver3(predicted_result, self.optimal_threshold)
         predicted_label = predicted_label[['drug1', 'drug2', 'SE', 'predicted_label', 'predicted_score']]
 
